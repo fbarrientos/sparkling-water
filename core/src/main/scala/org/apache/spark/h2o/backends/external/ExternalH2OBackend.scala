@@ -150,6 +150,12 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
   override def checkAndUpdateConf(conf: H2OConf): H2OConf = {
     super.checkAndUpdateConf(conf)
 
+    //
+    lazy val driverPath = sys.props.get("H2O_EXTENDED_DRIVER")
+    if(conf.h2oDriverPath.isEmpty && driverPath.isDefined){
+      conf.setH2ODriverPath(driverPath.get)
+    }
+
     if (conf.h2oDriverPath.isDefined) {
       if (conf.cloudName.isEmpty) {
         conf.setCloudName("sparkling-water-" + System.getProperty("user.name", "cluster") + "_" + Random.nextInt())
