@@ -73,15 +73,28 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
     // get ip port
     val clusterInfo = Source.fromFile(hc.getConf.clusterInfoFile.get).getLines
     val ipPort = clusterInfo.next()
-    yarnAppId = clusterInfo.next()
+    yarnAppId = clusterInfo.next().replace("job", "application")
 
     sys.ShutdownHookThread {
       if(hc.getConf.h2oDriverPath.isDefined){
-        s"yarn application -kill $yarnAppId".!
+        shutdownCleanUp()
       }
     }
     assert(proc == 0, s"Starting external H2O cluster failed with return value $proc.")
     ipPort
+  }
+
+  private def shutdownCleanUp(): Unit ={
+    try {
+      val hdfs = org.apache.hadoop.fs.FileSystem.get(hc.sparkContext.hadoopConfiguration)
+      hdfs.delete(new Path(hc.getConf.HDFSOutputDir.get), true)
+      new File(hc.getConf.clusterInfoFile.get).delete()
+    }catch {
+      case e: Exception => log.error(e.getMessage)
+    }
+    import scala.sys.process._
+    // kill the job
+    s"yarn application -kill $yarnAppId".!
   }
 
   override def init(): Array[NodeDesc] = {
@@ -136,17 +149,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
     // stop only when we have external h2o cluster running on yarn
     // otherwise stopping is not supported
     if(hc.getConf.HDFSOutputDir.isDefined){
-      try {
-        val hdfs = org.apache.hadoop.fs.FileSystem.get(hc.sparkContext.hadoopConfiguration)
-        hdfs.delete(new Path(hc.getConf.HDFSOutputDir.get), true)
-        new File(hc.getConf.clusterInfoFile.get).delete()
-      }catch {
-        case e: Exception => log.error(e.getMessage)
-      }
-      import scala.sys.process._
-      // kill the job
-      s"yarn application -kill $yarnAppId".!
-
+      shutdownCleanUp()
       //if (stopSparkContext) hc.sparkContext.stop()
       //H2O.orderlyShutdown(1000)
       //H2O.exit(0)
