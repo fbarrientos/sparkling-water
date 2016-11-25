@@ -71,7 +71,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
 
 
     // get ip port
-    val clusterInfo = Source.fromFile(hc.getConf.clusterInfoFile.get + ".tmp").getLines
+    val clusterInfo = Source.fromFile(hc.getConf.clusterInfoFile.get).getLines
     val ipPort = clusterInfo.next()
     yarnAppId = clusterInfo.next()
 
