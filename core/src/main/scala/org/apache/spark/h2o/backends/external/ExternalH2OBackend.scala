@@ -89,7 +89,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
     try {
       val hdfs = org.apache.hadoop.fs.FileSystem.get(hc.sparkContext.hadoopConfiguration)
       hdfs.delete(new Path(hc.getConf.HDFSOutputDir.get), true)
-      new File(hc.getConf.clusterInfoFile.get).delete()
+      //new File(hc.getConf.clusterInfoFile.get).delete()
     }catch {
       case e: Exception => log.error(e.getMessage)
     }
