@@ -46,7 +46,8 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
       "-notify", conf.clusterInfoFile.get,
       "-J", "-md5skip",
       "-mapperXmx", conf.mapperXmx,
-      "-output", conf.HDFSOutputDir.get
+      "-output", conf.HDFSOutputDir.get,
+      "-disown"
     )
 
     // start external h2o cluster and log the output
