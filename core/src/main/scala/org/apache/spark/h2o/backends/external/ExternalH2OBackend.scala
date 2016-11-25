@@ -18,6 +18,8 @@
 package org.apache.spark.h2o.backends.external
 
 
+import java.io.File
+
 import org.apache.hadoop.fs.Path
 import org.apache.spark.h2o.backends.SparklingBackend
 import org.apache.spark.h2o.utils.NodeDesc
