@@ -75,6 +75,11 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
     val ipPort = clusterInfo.next()
     yarnAppId = clusterInfo.next()
 
+    sys.ShutdownHookThread {
+      if(hc.getConf.h2oDriverPath.isDefined){
+        s"yarn application -kill $yarnAppId".!
+      }
+    }
     assert(proc == 0, s"Starting external H2O cluster failed with return value $proc.")
     ipPort
   }
