@@ -18,12 +18,10 @@
 package org.apache.spark.h2o.backends.external
 
 
-import java.io.File
-
 import org.apache.hadoop.fs.Path
-import org.apache.spark.h2o.{H2OConf, H2OContext}
 import org.apache.spark.h2o.backends.SparklingBackend
 import org.apache.spark.h2o.utils.NodeDesc
+import org.apache.spark.h2o.{H2OConf, H2OContext}
 import org.apache.spark.internal.Logging
 import water.api.RestAPIManager
 import water.{H2O, H2OStarter}
@@ -45,6 +43,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
       "-nodes", conf.numOfExternalH2ONodes.get,
       "-notify", conf.clusterInfoFile.get,
       "-J", "-md5skip",
+      "-J", "-name", conf.cloudName.get,
       "-mapperXmx", conf.mapperXmx,
       "-output", conf.HDFSOutputDir.get,
       "-disown"
