@@ -76,6 +76,9 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
     val ipPort = clusterInfo.next()
     yarnAppId = clusterInfo.next().replace("job", "application")
 
+    logInfo(s"Yarn ID obtained from cluster file: $yarnAppId")
+    logInfo(s"Cluster ip and port obtained from cluster file: $ipPort")
+
     sys.ShutdownHookThread {
       if(hc.getConf.h2oDriverPath.isDefined){
         shutdownCleanUp()
@@ -89,7 +92,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
     try {
       val hdfs = org.apache.hadoop.fs.FileSystem.get(hc.sparkContext.hadoopConfiguration)
       hdfs.delete(new Path(hc.getConf.HDFSOutputDir.get), true)
-      //new File(hc.getConf.clusterInfoFile.get).delete()
+      new File(hc.getConf.clusterInfoFile.get).delete()
     }catch {
       case e: Exception => log.error(e.getMessage)
     }
@@ -168,7 +171,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
 
     if (conf.h2oDriverPath.isDefined) {
       if (conf.cloudName.isEmpty) {
-        conf.setCloudName("sparkling-water-" + System.getProperty("user.name", "cluster") + "_" + Random.nextInt())
+        conf.setCloudName("sparkling-water-" + System.getProperty("user.name", "cluster") + "_" + Math.abs(Random.nextInt()))
       }
 
       if (conf.numOfExternalH2ONodes.isEmpty) {
