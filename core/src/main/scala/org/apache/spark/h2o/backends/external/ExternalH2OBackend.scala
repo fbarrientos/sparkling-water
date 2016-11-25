@@ -150,7 +150,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
   override def checkAndUpdateConf(conf: H2OConf): H2OConf = {
     super.checkAndUpdateConf(conf)
 
-    lazy val driverPath = sys.props.get("H2O_EXTENDED_DRIVER")
+    lazy val driverPath = sys.env.get("H2O_EXTENDED_DRIVER")
     if(conf.h2oDriverPath.isEmpty && driverPath.isDefined){
       log.info(s"Obtaining path to extended h2o driver from environment variable. Specified path is ${driverPath.get}")
       conf.setH2ODriverPath(driverPath.get)
