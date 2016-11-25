@@ -171,7 +171,7 @@ class ExternalH2OBackend(val hc: H2OContext) extends SparklingBackend with Exter
       }
 
       if(conf.clusterInfoFile.isEmpty){
-        conf.setClusterConfigFile(conf.cloudName.get)
+        conf.setClusterConfigFile("notify_" + conf.cloudName.get)
       }
 
     } else {
